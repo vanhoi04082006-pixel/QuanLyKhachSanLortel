@@ -33,13 +33,12 @@ const ACTIVE_PROMOS = [
 ];
 
 const formatCurrency = (amount: number) => new Intl.NumberFormat("vi-VN").format(amount) + "đ";
-const [activeTab, setActiveTab] = useState<"bookings" | "promos">("bookings");
-
 
 export default function ProfilePage() {
   // Trạng thái user đồng bộ hoàn toàn với Header
   const [user, setUser] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [activeTab, setActiveTab] = useState<"bookings" | "promos">("bookings");
 
   useEffect(() => {
     // Logic check y hệt Header của bạn

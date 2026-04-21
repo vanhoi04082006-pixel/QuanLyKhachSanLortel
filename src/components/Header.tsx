@@ -55,7 +55,7 @@ export default function Header() {
           <Link href="/profile" className={getMenuClass('/profile')}>Của tôi</Link>
         </nav>
 
-        {/* User actions */}git push origin main
+        {/* User actions */}
         <div className="flex gap-3">
           {user ? (
             <div className="flex items-center gap-3">

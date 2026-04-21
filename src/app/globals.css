@@ -65,6 +65,41 @@ body {
     .fade-up {
         animation: fadeInUp 0.8s ease forwards;
     }
+    /* Tab System Style Admin Dasboard */
+    .tab-container {
+        /* w-full và flex để dàn hàng ngang, sticky để cố định */
+        @apply flex items-center bg-white border-b border-gray-200 sticky top-11 z-50 w-full dark:bg-gray-900 dark:border-gray-800;
+    }
+
+    .tab-item {
+        /* flex-1 để các tab tự chia đều chiều rộng màn hình */
+        @apply flex-1 flex flex-col items-center justify-center py-4 gap-1 text-sm font-bold transition-all duration-200 border-b-2 border-transparent cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800;
+    }
+
+    .tab-item-active {
+        @apply border-emerald-500 text-emerald-600 bg-emerald-50/30 dark:bg-emerald-900/10 dark:text-emerald-400;
+    }
+
+    .tab-item-inactive {
+        @apply text-slate-400 dark:text-gray-500;
+    }
+
+    /* Dark Mode Text & Bg */
+    .text-main {
+        @apply text-slate-900 dark:text-white;
+    }
+    
+    .text-sub {
+        @apply text-slate-500 dark:text-gray-400;
+    }
+
+    .bg-main {
+        @apply bg-[#f9fafb] dark:bg-gray-950;
+    }
+
+    .card-custom {
+        @apply bg-white border border-gray-200 rounded-2xl dark:bg-gray-900 dark:border-gray-800;
+    }
 }
 
 @keyframes fadeInUp {

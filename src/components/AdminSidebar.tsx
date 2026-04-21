@@ -14,7 +14,13 @@ interface SidebarProps {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
 }
-
+interface NavItem {
+  href: string;
+  icon: string;
+  label: string;
+  badge?: number;
+  badgeColor?: string;
+}
 export default function AdminSidebar({
   admin,
   bookings,
@@ -28,37 +34,20 @@ export default function AdminSidebar({
   const pathname = usePathname();
 
   // Hàm helper để kiểm tra xem link có đang active không
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) =>
+  path === "/admin" ? pathname === path : pathname.startsWith(path);
 
   // Cấu hình Menu để code gọn hơn
-  const mainNav = [
-    { href: "/admin", icon: "fa-home", label: "Tổng quan" },
-    {
-      href: "/admin/infrastorage",
-      icon: "fa-calendar-check",
-      label: "Đặt phòng",
-      badge: bookings.filter((b) => b.status === "pending").length,
-      badgeColor: "bg-red-500",
-    },
-    { href: "/admin/infrastorage", icon: "fa-bed", label: "Quản lý phòng" },
-    { href: "/admin/hrmanage", icon: "fa-users", label: "Khách hàng" },
-    { href: "/admin/hrmanage", icon: "fa-user-tie", label: "Nhân viên" },
-  ];
-
-  const manageNav = [
-    { href: "/admin/command", icon: "fa-tags", label: "Khuyến mãi" },
-    { href: "/admin/finance", icon: "fa-chart-line", label: "Báo cáo" },
-    {
-      href: "/admin/messages",
-      icon: "fa-envelope",
-      label: "Tin nhắn",
-      badge: messages.reduce((sum, m) => sum + (m.unread || 0), 0),
-      badgeColor: "bg-green-500",
-    },
-  ];
+  const mainNav: NavItem[] = [
+  { href: "/admin", icon: "fa-home", label: "Dashboard" },
+  { href: "/admin/finance", icon: "fa-file-invoice-dollar", label: "Tài vụ & Kế toán" },
+  { href: "/admin/infastorage", icon: "fa-building", label: "Hạ tầng & Kho bãi" },
+  { href: "/admin/hrmanage", icon: "fa-user-tie", label: "Nhân sự" },
+  { href: "/admin/command", icon: "fa-bullhorn", label: "Điều lệnh" },
+];
 
   return (
-    <aside className="w-72 bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col shadow-2xl h-screen sticky top-0">
+    <aside className="w-72 bg-linear-to-b from-gray-900 to-gray-800 text-white flex flex-col shadow-2xl h-screen sticky top-0">
       {/* LOGO */}
       <div className="p-6 border-b border-gray-700">
         <div className="flex items-center gap-3">
@@ -80,7 +69,7 @@ export default function AdminSidebar({
           className="flex items-center gap-3 cursor-pointer hover:bg-white/5 p-2 rounded-lg transition"
           onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
         >
-          <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center font-bold shadow-lg">
+          <div className="w-10 h-10 bg-linear-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center font-bold shadow-lg">
             {admin?.name?.charAt(0).toUpperCase() || "A"}
           </div>
           <div className="flex-1 overflow-hidden">
@@ -120,35 +109,6 @@ export default function AdminSidebar({
           </p>
           <div className="space-y-1">
             {mainNav.map((item, idx) => (
-              <Link
-                key={idx}
-                href={item.href}
-                className={`sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-all ${
-                  isActive(item.href)
-                    ? "active bg-emerald-500/10 text-emerald-400"
-                    : "text-gray-400 hover:bg-white/5"
-                }`}
-              >
-                <i className={`fas ${item.icon} w-5`}></i>
-                <span className="flex-1">{item.label}</span>
-                {item.badge ? (
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full text-white font-bold ${item.badgeColor || "bg-gray-600"}`}
-                  >
-                    {item.badge}
-                  </span>
-                ) : null}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="px-4">
-          <p className="text-[10px] font-black text-gray-500 uppercase px-3 mb-2 tracking-widest">
-            Quản lý hệ thống
-          </p>
-          <div className="space-y-1">
-            {manageNav.map((item, idx) => (
               <Link
                 key={idx}
                 href={item.href}

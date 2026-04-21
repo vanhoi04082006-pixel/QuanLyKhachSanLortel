@@ -1269,7 +1269,7 @@ export default function AdminPage() {
               {promotions.map((p) => (
                 <div
                   key={p.id}
-                  className={`bg-gradient-to-r ${p.type === "percent" ? "from-purple-500 to-pink-500" : "from-blue-500 to-cyan-500"} rounded-xl p-5 text-white`}
+                  className={`bg-linear-to-r ${p.type === "percent" ? "from-purple-500 to-pink-500" : "from-blue-500 to-cyan-500"} rounded-xl p-5 text-white`}
                 >
                   <span className="text-xs bg-white/20 px-2 py-1 rounded">
                     {p.code}
@@ -1340,7 +1340,7 @@ export default function AdminPage() {
                 <h3 className="font-bold mb-3">
                   Doanh thu theo tháng (Triệu VNĐ)
                 </h3>
-                <div className="h-[200px]">
+                <div className="h-50">
                   <Bar
                     data={{
                       labels: [
@@ -1371,7 +1371,7 @@ export default function AdminPage() {
               </div>
               <div className="bg-white p-5 rounded-xl shadow-sm dark:bg-gray-800">
                 <h3 className="font-bold mb-3">Trạng thái đặt phòng</h3>
-                <div className="h-[200px]">
+                <div className="h-50">
                   <Doughnut
                     data={{
                       labels: ["Đã xác nhận", "Chờ xác nhận", "Hoàn thành"],
@@ -1434,7 +1434,7 @@ export default function AdminPage() {
         return (
           <div className="space-y-6">
             <h1 className="text-2xl font-bold">Tin nhắn</h1>
-            <div className="bg-white rounded-xl shadow-sm border h-[600px] dark:bg-gray-800 dark:border-gray-700">
+            <div className="bg-white rounded-xl shadow-sm border h-150 dark:bg-gray-800 dark:border-gray-700">
               <div className="grid grid-cols-3 h-full">
                 <div className="border-r dark:border-gray-700">
                   <div className="p-4 border-b dark:border-gray-700">
@@ -1633,7 +1633,7 @@ export default function AdminPage() {
       {/* TOAST */}
       {toast.visible && (
         <div
-          className={`fixed bottom-5 right-5 px-6 py-3 rounded-xl text-white shadow-2xl z-[1000] ${toast.type === "error" ? "bg-red-500" : toast.type === "info" ? "bg-blue-500" : "bg-emerald-500"}`}
+          className={`fixed bottom-5 right-5 px-6 py-3 rounded-xl text-white shadow-2xl z-1000 ${toast.type === "error" ? "bg-red-500" : toast.type === "info" ? "bg-blue-500" : "bg-emerald-500"}`}
         >
           {toast.message}
         </div>

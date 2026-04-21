@@ -3,6 +3,7 @@
 
 import AdminSidebar from "@/components/AdminSidebar";
 import { useAdminDashboard } from "@/components/useAdminDashboard";
+import { DarkModeContext } from "@/contexts/DarkModeContext"; // thêm import context
 
 export default function AdminLayout({
   children,
@@ -34,7 +35,7 @@ export default function AdminLayout({
         toggleDarkMode={toggleDarkMode}
       />
 
-      <main className="flex-1 overflow-y-auto bg-slate-950 p-6">
+      <main className="flex-1 flex flex-col bg-slate-950 overflow-y-auto">
         {/* Nội dung các trang con sẽ hiển thị tại children */}
         {children}
       </main>

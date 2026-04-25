@@ -158,166 +158,380 @@ import data from "@/data/infrastorageDummyData.json";
 
 const infraData = data as InfraStorageData;
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
-export default function FinancePage() {
-  const [activeTab, setActiveTab] = useState<FinanceTab>("overview");
-  const [taxBills, setTaxBills] = useState<TaxBill[]>(initialTaxBills);
-  const [sheetSearch, setSheetSearch] = useState("");
-  const [forumFilter, setForumFilter] = useState("all");
-  const [currentTime, setCurrentTime] = useState("");
-  const [branch, setBranch] = useState("br-001");
+export default function InfastoragePage() {
   const { isDarkMode } = useDarkMode();
-  const { customers, bookings, formatCurrency } = useAdminDashboard();
-  const statusData = [
-    bookings.filter((b) => b.status === "confirmed").length,
-    bookings.filter((b) => b.status === "pending").length,
-    bookings.filter((b) => b.status === "completed").length,
+  const [activeTab, setActiveTab] = useState<InfrastorageTab>("overview");
+  const [selectedBranch, setSelectedBranch] = useState("br-001");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [currentDateTime, setCurrentDateTime] = useState("");
+  const [pendingImports, setPendingImports] = useState<any[]>([]);
+  const [importFormData, setImportFormData] = useState({
+    itemName: "",
+    itemQty: "",
+    itemSupplier: "",
+  });
+  const [showImportModal, setShowImportModal] = useState(false);
+
+  // Branch data
+  const branchesData: Record<string, any> = {
+    "br-001": {
+      name: "Riverside Premium Hotel & Spa",
+      type: "5-Star Luxury Resort",
+      address: "123 Bến Vân Đồn, Phường 6, Quận 4, TP. Hồ Chí Minh",
+      contact: "(+84) 28 3822 1234",
+      staff: "124 (Đang ca: 32)",
+      area: "12,500 m²",
+      floors: "25 Tầng",
+      rooms: "350 Phòng",
+      iot: "Trực tuyến (98% Thiết bị)",
+      status: "Chi nhánh trọng điểm (HQ)",
+      note: "Bảo trì hệ thống lạnh lầu 4 (Dự kiến xong: 16:00)",
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400",
+    },
+    "br-002": {
+      name: "City Center Luxury Hotel",
+      type: "Boutique Hotel",
+      address: "45 Lê Thánh Tôn, Quận 1, TP. Hồ Chí Minh",
+      contact: "(+84) 28 3822 5566",
+      staff: "85 (Đang ca: 15)",
+      area: "5,000 m²",
+      floors: "12 Tầng",
+      rooms: "120 Phòng",
+      iot: "Trực tuyến (100% Thiết bị)",
+      status: "Chi nhánh nội đô",
+      note: "Hoạt động bình thường",
+      image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400",
+    },
+    "br-003": {
+      name: "Lortel Beachfront Resort",
+      type: "Coastal Resort",
+      address: "Trần Phú, TP. Nha Trang, Khánh Hòa",
+      contact: "(+84) 258 3822 9999",
+      staff: "210 (Đang ca: 45)",
+      area: "45,000 m²",
+      floors: "05 Tầng (Bungalow)",
+      rooms: "280 Phòng",
+      iot: "Cảnh báo (85% Thiết bị - Mất kết nối khu B)",
+      status: "Resort nghỉ dưỡng",
+      note: "Đang chuẩn bị cho mùa du lịch cao điểm",
+      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400",
+    },
+  };
+
+  // Infrastructure data
+  const infraData = [
+    {
+      item: "Hệ thống PCCC",
+      area: "Toàn tòa nhà",
+      status: "Hoạt động tốt",
+      time: "18/05/2026 - 09:00",
+    },
+    {
+      item: "Thang máy số 3",
+      area: "Sảnh chính",
+      status: "Đang bảo trì",
+      time: "20/05/2026 - 14:20",
+    },
+    {
+      item: "Máy phát điện dự phòng",
+      area: "Tầng hầm B2",
+      status: "Sẵn sàng",
+      time: "15/05/2026 - 08:30",
+    },
+    {
+      item: "Hệ thống Chiller",
+      area: "Tầng kỹ thuật",
+      status: "Hoạt động tốt",
+      time: "19/05/2026 - 10:00",
+    },
+    {
+      item: "Camera an ninh (CCTV)",
+      area: "Hành lang lầu 1-5",
+      status: "Hoạt động tốt",
+      time: "20/05/2026 - 07:45",
+    },
+    {
+      item: "Hệ thống xử lý nước",
+      area: "Khu vực hồ bơi",
+      status: "Cần kiểm tra",
+      time: "20/05/2026 - 11:30",
+    },
+    {
+      item: "Wifi tầng trệt",
+      area: "Khu vực Cafe",
+      status: "Sự cố kết nối",
+      time: "20/05/2026 - 15:10",
+    },
   ];
 
-  // Bill Modal
-  const [isBillModalOpen, setIsBillModalOpen] = useState(false);
-  const [billForm, setBillForm] = useState({
-    type: "Thuế TNCN",
-    issuer: "",
-    amount: "",
-    due: "",
-  });
+  // Warehouse data
+  const warehouseData = [
+    { name: "Bộ chăn ga Standard", qty: 150, min: 50, rating: "Tốt" },
+    { name: "Khăn tắm loại A", qty: 45, min: 100, rating: "Cần nhập thêm" },
+    { name: "Dầu gội / Sữa tắm (thùng)", qty: 12, min: 5, rating: "Tốt" },
+    { name: "Nước suối đóng chai", qty: 500, min: 200, rating: "Tốt" },
+    {
+      name: "Bộ đồ dùng cá nhân (Amenity)",
+      qty: 30,
+      min: 150,
+      rating: "Cần nhập thêm",
+    },
+    {
+      name: "Giấy vệ sinh cao cấp",
+      qty: 25,
+      min: 30,
+      rating: "Sắp hết",
+    },
+    { name: "Dép đi trong phòng", qty: 80, min: 40, rating: "Tốt" },
+  ];
 
-  // Toast
-  const [toast, setToast] = useState({
-    visible: false,
-    message: "",
-    type: "success",
-  });
+  // Services data
+  const servicesData = [
+    {
+      name: "Buffet Sáng",
+      price: "350,000 VND",
+      status: "Hoạt động",
+      reason: "-",
+    },
+    {
+      name: "Giặt ủi lấy liền",
+      price: "Theo bảng giá",
+      status: "Hoạt động",
+      reason: "-",
+    },
+    {
+      name: "Hồ bơi vô cực",
+      price: "Miễn phí (Khách lưu trú)",
+      status: "Tạm ngưng",
+      reason: "Thay nước định kỳ",
+    },
+    {
+      name: "Dịch vụ Spa & Massage",
+      price: "800,000 VND",
+      status: "Hoạt động",
+      reason: "-",
+    },
+    {
+      name: "Xe đưa đón sân bay",
+      price: "500,000 VND/lượt",
+      status: "Hoạt động",
+      reason: "-",
+    },
+    {
+      name: "Phòng Gym 24/7",
+      price: "Miễn phí",
+      status: "Hoạt động",
+      reason: "-",
+    },
+    {
+      name: "Bar sân thượng",
+      price: "Theo menu",
+      status: "Tạm ngưng",
+      reason: "Sửa chữa sàn gỗ",
+    },
+  ];
 
-  const showToast = useCallback((message: string, type = "success") => {
-    setToast({ visible: true, message, type });
-    setTimeout(() => setToast((t) => ({ ...t, visible: false })), 3000);
-  }, []);
-
-  // Clock
+  // Update date time
   useEffect(() => {
-    const tick = () => {
+    const updateDateTime = () => {
       const now = new Date();
-      setCurrentTime(
-        `${now.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" })} - ${now.toLocaleTimeString("vi-VN", { hour12: false })}`,
-      );
+      const dateStr = now.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+      const timeStr = now.toLocaleTimeString("vi-VN", { hour12: false });
+      setCurrentDateTime(`${dateStr} - ${timeStr}`);
     };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
+    updateDateTime();
+    const interval = setInterval(updateDateTime, 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  const markPaid = (id: string) => {
-    setTaxBills((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, status: "Đã thanh toán" } : b)),
-    );
-    showToast("Đã đánh dấu thanh toán");
+  const getCurrentBranchData = () => branchesData[selectedBranch];
+
+  const handleImportSubmit = () => {
+    if (!importFormData.itemName || !importFormData.itemQty) return;
+
+    const newImport = {
+      id: Date.now(),
+      name: importFormData.itemName,
+      qty: importFormData.itemQty,
+      supplier: importFormData.itemSupplier,
+    };
+
+    setPendingImports([...pendingImports, newImport]);
+    setImportFormData({ itemName: "", itemQty: "", itemSupplier: "" });
+    setShowImportModal(false);
   };
 
-  const addBill = () => {
-    if (!billForm.amount) {
-      showToast("Vui lòng nhập số tiền", "error");
-      return;
-    }
-    const newId = `INV-2026-${String(taxBills.length + 61).padStart(3, "0")}`;
-    const formatted = Number(billForm.amount).toLocaleString("vi-VN");
-    const due = billForm.due
-      ? new Date(billForm.due).toLocaleDateString("vi-VN")
-      : "—";
-    setTaxBills((prev) => [
-      {
-        id: newId,
-        type: billForm.type,
-        issuer: billForm.issuer || "—",
-        amount: formatted,
-        due,
-        status: "Chờ thanh toán",
-      },
-      ...prev,
-    ]);
-    setBillForm({ type: "Thuế TNCN", issuer: "", amount: "", due: "" });
-    setIsBillModalOpen(false);
-    showToast("Đã thêm hóa đơn mới");
-  };
-
-  const filteredSheets = refSheets.filter(
-    (s) =>
-      s.title.toLowerCase().includes(sheetSearch.toLowerCase()) ||
-      s.cat.toLowerCase().includes(sheetSearch.toLowerCase()),
-  );
-
-  const filteredForum =
-    forumFilter === "all"
-      ? forumPosts
-      : forumPosts.filter((p) => p.tag === forumFilter);
-  const pinnedPosts = forumPosts.filter((p) => p.pinned);
-
-  const overdueCount = taxBills.filter((b) => b.status === "Quá hạn").length;
-  const upcomingCount = taxBills.filter(
-    (b) => b.status === "Sắp đến hạn",
-  ).length;
-  const paidCount = taxBills.filter((b) => b.status === "Đã thanh toán").length;
-
-  // Nav items
-  const navItems: { id: FinanceTab; label: string }[] = [
-    { id: "overview", label: "Báo cáo tài chính" },
-    { id: "salary", label: "Thống kê lương" },
-    { id: "taxes", label: "Thuế & Hóa đơn" },
-    { id: "sheets", label: "Biểu mẫu tham chiếu" },
-    { id: "forum", label: "Diễn đàn / Tin tức" },
-  ];
+  const branchData = getCurrentBranchData();
 
   return (
-    <div
-      className={`${isDarkMode ? "dark" : ""} bg-main transition-colors duration-300`}
-    >
-      {/* HEADER */}
-      <header className=" bg-slate-900 px-6 py-3 flex sticky top-0 z-50">
+    <div className={`flex flex-col h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-100"}`}>
+      {/* Sidebar */}
+      <div
+        className={`fixed inset-y-0 left-0 w-64 bg-slate-900 text-white z-50 shadow-2xl transition-transform ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="p-6 flex flex-col h-full">
+          <div className="flex justify-between items-center mb-10">
+            <h2 className="text-xl font-bold tracking-tighter">LORTEL</h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="text-slate-400 hover:text-white"
+            >
+              ✕
+            </button>
+          </div>
+          <nav className="space-y-4 flex-1">
+            <a
+              href="#"
+              className="flex items-center p-3 hover:bg-slate-800 rounded-lg transition text-sm"
+            >
+              Lễ tân
+            </a>
+            <a
+              href="#"
+              className="flex items-center p-3 hover:bg-slate-800 rounded-lg transition text-sm"
+            >
+              Nhân sự
+            </a>
+            <a
+              href="#"
+              className="flex items-center p-3 bg-blue-600 rounded-lg font-bold text-sm"
+            >
+              Chi nhánh
+            </a>
+            <a
+              href="#"
+              className="flex items-center p-3 hover:bg-slate-800 rounded-lg transition text-sm"
+            >
+              Tài vụ
+            </a>
+          </nav>
+          <div className="text-[10px] text-slate-500 mt-auto uppercase font-bold">
+            Infras Module v0.1
+          </div>
+        </div>
+      </div>
+
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        />
+      )}
+
+      {/* Header */}
+      <header className="bg-white border-b px-6 py-3 flex justify-between items-center shadow-sm shrink-0">
         <div className="flex items-center space-x-4">
-          <div className="border-l pl-4 text-sm font-black text-white uppercase">
-            Tài vụ &amp; Kế toán
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 hover:bg-gray-100 rounded-md transition"
+          >
+            <svg
+              className="w-6 h-6 text-gray-700"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+          <div className="border-l pl-4">
+            <span className="text-xs font-mono text-gray-500 uppercase tracking-widest">
+              {currentDateTime}
+            </span>
+            <h1 className="text-sm font-black text-slate-900 uppercase">
+              Quản lý hạ tầng & Dịch vụ
+            </h1>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-xs font-bold text-slate-700">Admin</span>
+          <div className="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-[10px] font-bold">
+            INF
           </div>
         </div>
       </header>
-      {/* Tabs Navigation - Fixed dưới header */}
-      
-      <div className="tab-container overflow-x-auto no-scrollbar">
-        {[
-          { id: "overview", label: "Báo cáo tài chính", icon: "fa-chart-line" },
-          { id: "salary", label: "Bảng lương", icon: "fa-money-bill-wave" },
-          {
-            id: "taxes",
-            label: "Thuế & Hoá đơn",
-            icon: "fa-file-invoice-dollar",
-          },
-          { id: "sheets", label: "Tài liệu tham khảo", icon: "fa-book" },
-          { id: "forum", label: "Thảo luận nội bộ", icon: "fa-users" },
-        ].map((tab) => (
-          <div
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as FinanceTab)}
-            className={`tab-item flex items-center gap-2 ${
-              activeTab === tab.id ? "tab-item-active" : "tab-item-inactive"
-            }`}
-          >
-            <i className={`fas ${tab.icon} text-xs`}></i>
-            {tab.label}
+
+      {/* Main Body */}
+      <main className="flex-1 flex overflow-hidden">
+        {/* Left Nav */}
+        <aside className="w-64 bg-slate-800 flex flex-col shrink-0">
+          <div className="p-4">
+            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">
+              Danh mục quản lý
+            </h3>
+            <nav className="space-y-1">
+              <button
+                onClick={() => setActiveTab("overview")}
+                className={`w-full flex items-center p-3 text-[11px] font-bold rounded transition text-left uppercase ${
+                  activeTab === "overview"
+                    ? "bg-slate-900 text-amber-400 border-r-4 border-amber-400"
+                    : "text-slate-300 hover:bg-slate-700"
+                }`}
+              >
+                Tổng quan chi nhánh
+              </button>
+              <button
+                onClick={() => setActiveTab("infrastructure")}
+                className={`w-full flex items-center p-3 text-[11px] font-bold rounded transition text-left uppercase ${
+                  activeTab === "infrastructure"
+                    ? "bg-slate-900 text-amber-400 border-r-4 border-amber-400"
+                    : "text-slate-300 hover:bg-slate-700"
+                }`}
+              >
+                Cơ sở hạ tầng
+              </button>
+              <button
+                onClick={() => setActiveTab("storage")}
+                className={`w-full flex items-center p-3 text-[11px] font-bold rounded transition text-left uppercase ${
+                  activeTab === "storage"
+                    ? "bg-slate-900 text-amber-400 border-r-4 border-amber-400"
+                    : "text-slate-300 hover:bg-slate-700"
+                }`}
+              >
+                Kho bãi / Vật tư
+              </button>
+              <button
+                onClick={() => setActiveTab("services")}
+                className={`w-full flex items-center p-3 text-[11px] font-bold rounded transition text-left uppercase ${
+                  activeTab === "services"
+                    ? "bg-slate-900 text-amber-400 border-r-4 border-amber-400"
+                    : "text-slate-300 hover:bg-slate-700"
+                }`}
+              >
+                Dịch vụ khách sạn
+              </button>
+            </nav>
           </div>
-        ))}
-      </div>
-      {/* MAIN BODY */}
-      <main className=" bg-slate-800/50 flex-1 flex overflow-hidden">
-        {/* CONTENT */}
-        <section className="flex-1 overflow-hidden p-5 flex flex-col gap-4">
+          <div className="mt-auto p-4 bg-slate-900/50">
+            <div className="flex justify-between text-[10px] text-slate-400 font-bold uppercase">
+              <span>Trạng thái hệ thống</span>
+              <span className="text-green-400">Ổn định</span>
+            </div>
+          </div>
+        </aside>
+
+        {/* Right Content */}
+        <section className="flex-1 overflow-y-auto p-6">
           {/* Branch Selector */}
-          <div className="shrink-0">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+          <div className="mb-6">
+            <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
               Chi nhánh đang xem
-            </label>
+            </h3>
             <select
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-              className="w-72 bg-white border border-slate-300 text-slate-700 text-[11px] font-bold uppercase rounded p-2 focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer"
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-[11px] font-bold uppercase rounded p-2 focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer"
             >
               <option value="br-001">Riverside Premium</option>
               <option value="br-002">City Center Luxury</option>
@@ -325,643 +539,418 @@ export default function FinancePage() {
             </select>
           </div>
 
-          {/* ─── TAB 0: OVERVIEW ─── */}
+          {/* Tab: Tổng quan chi nhánh */}
           {activeTab === "overview" && (
-            <div className="space-y-6">
-              <h1 className="text-2xl font-bold">Báo cáo & Thống kê</h1>
-              <div className="bg-white p-4 rounded-xl shadow-sm dark:bg-gray-800">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                  <select className="border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600">
-                    <option value="revenue">Doanh thu</option>
-                    <option value="bookings">Đặt phòng</option>
-                  </select>
-                  <select
-                    defaultValue="month"
-                    className="border rounded-lg px-3 py-2 text-sm dark:bg-gray-700 dark:border-gray-600"
-                  >
-                    <option value="week">Tuần này</option>
-                    <option value="month">Tháng này</option>
-                    <option value="year">Năm này</option>
-                  </select>
-                  <button
-                    className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm"
-                    onClick={() => showToast("Đang tạo báo cáo...", "info")}
-                  >
-                    <i className="fas fa-chart-line mr-2"></i>Tạo báo cáo
-                  </button>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-white p-5 rounded-xl shadow-sm dark:bg-gray-800">
-                  <h3 className="font-bold mb-3">
-                    Doanh thu theo tháng (Triệu VNĐ)
-                  </h3>
-                  <div className="h-50">
-                    <Bar
-                      data={{
-                        labels: [
-                          "T1",
-                          "T2",
-                          "T3",
-                          "T4",
-                          "T5",
-                          "T6",
-                          "T7",
-                          "T8",
-                          "T9",
-                          "T10",
-                          "T11",
-                          "T12",
-                        ],
-                        datasets: [
-                          {
-                            label: "Doanh thu",
-                            data: monthlyData,
-                            backgroundColor: "#10b981",
-                          },
-                        ],
-                      }}
-                      options={{ responsive: true, maintainAspectRatio: false }}
-                    />
-                  </div>
-                </div>
-                <div className="bg-white p-5 rounded-xl shadow-sm dark:bg-gray-800">
-                  <h3 className="font-bold mb-3">Trạng thái đặt phòng</h3>
-                  <div className="h-50">
-                    <Doughnut
-                      data={{
-                        labels: ["Đã xác nhận", "Chờ xác nhận", "Hoàn thành"],
-                        datasets: [
-                          {
-                            data: statusData,
-                            backgroundColor: ["#10b981", "#f59e0b", "#3b82f6"],
-                          },
-                        ],
-                      }}
-                      options={{ responsive: true, maintainAspectRatio: false }}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white p-5 rounded-xl shadow-sm dark:bg-gray-800">
-                <h3 className="font-bold mb-3">Top khách hàng thân thiết</h3>
-                <div className="space-y-3">
-                  {[...customers]
-                    .sort((a, b) => b.totalSpent - a.totalSpent)
-                    .slice(0, 5)
-                    .map((c, i) => (
-                      <div
-                        key={c.id}
-                        className="flex justify-between items-center"
-                      >
-                        <div>
-                          <span className="w-6 inline-block">{i + 1}.</span>
-                          {c.name}
-                        </div>
-                        <span className="font-medium">
-                          {c.bookings} đặt - {formatCurrency(c.totalSpent)}
-                        </span>
-                      </div>
-                    ))}
-                </div>
-              </div>
-              <div className="bg-white p-5 rounded-xl shadow-sm dark:bg-gray-800">
-                <h3 className="font-bold mb-3">Xuất báo cáo</h3>
-                <div className="flex gap-3">
-                  <button
-                    className="px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-                    onClick={() => showToast("Đang xuất PDF...", "info")}
-                  >
-                    <i className="fas fa-file-pdf text-red-500 mr-2"></i>PDF
-                  </button>
-                  <button
-                    className="px-4 py-2 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-                    onClick={() => showToast("Đang xuất Excel...", "info")}
-                  >
-                    <i className="fas fa-file-excel text-green-500 mr-2"></i>
-                    Excel
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ─── TAB 1: SALARY ─── */}
-          {activeTab === "salary" && (
-            <div className="flex-1 flex flex-col gap-4 overflow-hidden">
-              {/* KPI Row */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 shrink-0">
-                <div className="bg-white rounded border p-4 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    Tổng quỹ lương T6
-                  </p>
-                  <p className="font-mono font-bold text-2xl text-slate-900 tracking-tight">
-                    4.82 Tỷ
-                  </p>
-                  <p className="text-[10px] text-green-600 mt-1 font-bold">
-                    ▲ +3.2% so tháng trước
-                  </p>
-                </div>
-                <div className="bg-white rounded border p-4 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    Lương TB / nhân viên
-                  </p>
-                  <p className="font-mono font-bold text-2xl text-slate-900 tracking-tight">
-                    18.9 Triệu
-                  </p>
-                  <p className="text-[10px] text-slate-400 mt-1 font-bold">
-                    124 nhân sự active
-                  </p>
-                </div>
-                <div className="bg-white rounded border p-4 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    Thưởng KPI tháng
-                  </p>
-                  <p className="font-mono font-bold text-2xl text-amber-600 tracking-tight">
-                    312 Triệu
-                  </p>
-                  <p className="text-[10px] text-green-600 mt-1 font-bold">
-                    ▲ +8.5% vs T5
-                  </p>
-                </div>
-                <div className="bg-white rounded border p-4 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    Trạng thái chi trả
-                  </p>
-                  <p className="font-mono font-bold text-2xl text-green-600 tracking-tight">
-                    Hoàn tất
-                  </p>
-                  <p className="text-[10px] text-slate-400 mt-1 font-bold">
-                    Ngày 25/06/2026
-                  </p>
-                </div>
-              </div>
-
-              {/* Chart + Table */}
-              <div className="flex gap-4 flex-1 overflow-hidden min-h-0">
-                {/* Bar chart */}
-                <div className="bg-white rounded border p-4 flex flex-col w-72 shrink-0">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                    Lương 6 tháng gần nhất (triệu VND)
-                  </p>
-                  <div className="flex-1 min-h-0 relative">
-                    <Bar data={salaryChartData} options={salaryChartOptions} />
-                  </div>
-                </div>
-
-                {/* Department Table */}
-                <div className="bg-white rounded border flex-1 flex flex-col overflow-hidden">
-                  <div className="p-3 border-b bg-gray-50 flex justify-between items-center shrink-0">
-                    <h3 className="font-bold text-xs uppercase tracking-tighter text-slate-700">
-                      Chi tiết lương theo phòng ban
-                    </h3>
-                    <button
-                      onClick={() => showToast("Đang xuất Excel...", "info")}
-                      className="bg-slate-800 text-white px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-slate-700 transition"
-                    >
-                      Xuất Excel
-                    </button>
-                  </div>
-                  <div className="flex-1 overflow-y-auto">
-                    <table className="w-full text-[11px] text-left">
-                      <thead className="bg-slate-100 text-slate-600 sticky top-0 uppercase font-black">
-                        <tr>
-                          <th className="p-3 border-b">Phòng ban</th>
-                          <th className="p-3 border-b text-center">Nhân sự</th>
-                          <th className="p-3 border-b text-right">
-                            Tổng lương
-                          </th>
-                          <th className="p-3 border-b text-right">Lương TB</th>
-                          <th className="p-3 border-b text-center">
-                            Trạng thái
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y">
-                        {salaryDepts.map((d, i) => (
-                          <tr key={i} className="hover:bg-slate-50 transition">
-                            <td className="p-3 font-bold text-slate-700">
-                              {d.dept}
-                            </td>
-                            <td className="p-3 text-center font-mono text-slate-600">
-                              {d.count}
-                            </td>
-                            <td className="p-3 text-right font-mono font-bold text-blue-600">
-                              {d.total}
-                            </td>
-                            <td className="p-3 text-right font-mono text-slate-600">
-                              {d.avg}
-                            </td>
-                            <td className="p-3 text-center">
-                              <span
-                                className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${d.status === "Hoàn tất" ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}
-                              >
-                                {d.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ─── TAB 2: TAXES & BILLS ─── */}
-          {activeTab === "taxes" && (
-            <div className="flex-1 flex flex-col gap-4 overflow-hidden">
-              {/* Summary pills */}
-              <div className="grid grid-cols-3 gap-3 shrink-0">
-                <div className="bg-white rounded border p-4 border-l-4 border-l-red-500 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    Hóa đơn quá hạn
-                  </p>
-                  <p className="font-mono font-bold text-3xl text-red-600">
-                    {overdueCount}
-                  </p>
-                </div>
-                <div className="bg-white rounded border p-4 border-l-4 border-l-amber-500 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    Đến hạn trong 7 ngày
-                  </p>
-                  <p className="font-mono font-bold text-3xl text-amber-600">
-                    {upcomingCount}
-                  </p>
-                </div>
-                <div className="bg-white rounded border p-4 border-l-4 border-l-green-500 hover:-translate-y-0.5 hover:shadow-md transition-all">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                    Đã thanh toán T6
-                  </p>
-                  <p className="font-mono font-bold text-3xl text-green-600">
-                    {paidCount}
-                  </p>
-                </div>
-              </div>
-
-              {/* Bills Table */}
-              <div className="bg-white rounded border flex-1 flex flex-col overflow-hidden">
-                <div className="p-3 border-b bg-gray-50 flex justify-between items-center shrink-0">
-                  <h3 className="font-bold text-xs uppercase tracking-tighter text-slate-700">
-                    Danh sách thuế &amp; hoá đơn
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <select className="border rounded text-[10px] font-bold px-2 py-1 text-slate-600 outline-none">
-                      <option>Tất cả trạng thái</option>
-                      <option>Quá hạn</option>
-                      <option>Sắp đến hạn</option>
-                      <option>Đã thanh toán</option>
-                    </select>
-                    <button
-                      onClick={() => setIsBillModalOpen(true)}
-                      className="bg-amber-500 text-white px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-amber-600 transition"
-                    >
-                      + Thêm hóa đơn
-                    </button>
-                  </div>
-                </div>
-                <div className="flex-1 overflow-y-auto">
-                  <table className="w-full text-[11px] text-left">
-                    <thead className="bg-slate-100 text-slate-600 sticky top-0 uppercase font-black">
-                      <tr>
-                        <th className="p-3 border-b">Mã HĐ</th>
-                        <th className="p-3 border-b">Loại</th>
-                        <th className="p-3 border-b">Đơn vị phát hành</th>
-                        <th className="p-3 border-b text-right">Số tiền</th>
-                        <th className="p-3 border-b text-center">Hạn nộp</th>
-                        <th className="p-3 border-b text-center">Trạng thái</th>
-                        <th className="p-3 border-b text-center">Thao tác</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {taxBills.map((d) => (
-                        <tr key={d.id} className="hover:bg-slate-50 transition">
-                          <td className="p-3 font-mono text-slate-500">
-                            {d.id}
-                          </td>
-                          <td className="p-3 font-bold text-slate-700">
-                            {d.type}
-                          </td>
-                          <td className="p-3 text-slate-600">{d.issuer}</td>
-                          <td className="p-3 text-right font-mono font-bold text-slate-800">
-                            {d.amount} ₫
-                          </td>
-                          <td className="p-3 text-center font-mono text-slate-600">
-                            {d.due}
-                          </td>
-                          <td className="p-3 text-center">
-                            <span
-                              className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${statusColor(d.status)}`}
-                            >
-                              {d.status}
-                            </span>
-                          </td>
-                          <td className="p-3 text-center">
-                            {d.status !== "Đã thanh toán" ? (
-                              <button
-                                onClick={() => markPaid(d.id)}
-                                className="text-[9px] font-black uppercase bg-slate-800 text-white px-2 py-1 rounded hover:bg-slate-600 transition"
-                              >
-                                Đã nộp
-                              </button>
-                            ) : (
-                              <span className="text-[9px] text-slate-300 font-bold uppercase">
-                                —
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ─── TAB 3: REFERENCE SHEETS ─── */}
-          {activeTab === "sheets" && (
-            <div className="flex-1 flex flex-col gap-4 overflow-hidden">
-              {/* Search bar */}
-              <div className="flex items-center gap-3 shrink-0">
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm biểu mẫu..."
-                  value={sheetSearch}
-                  onChange={(e) => setSheetSearch(e.target.value)}
-                  className="flex-1 border rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500 text-slate-700 bg-white"
-                />
-                <select className="border rounded text-[10px] font-bold px-3 py-2 text-slate-600 outline-none bg-white">
-                  <option>Tất cả loại</option>
-                  <option>Lương</option>
-                  <option>Thuế</option>
-                  <option>Bảo hiểm</option>
-                  <option>Quyết toán</option>
-                </select>
-              </div>
-
-              {/* Sheets Grid */}
-              <div className="flex-1 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {filteredSheets.map((s, i) => (
-                    <div
-                      key={i}
-                      className="bg-white rounded border p-4 flex flex-col gap-2 hover:bg-slate-50 transition"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-[11px] font-black text-slate-800 leading-snug">
-                          {s.title}
-                        </p>
-                        <span
-                          className={`shrink-0 px-2 py-0.5 rounded text-[9px] font-black uppercase ${catColor(s.cat)}`}
-                        >
-                          {s.cat}
-                        </span>
-                      </div>
-                      <p className="text-[10px] text-slate-500 leading-relaxed">
-                        {s.desc}
-                      </p>
-                      <div className="flex items-center justify-between mt-auto pt-2 border-t">
-                        <span className="text-[9px] font-mono text-slate-400">
-                          Cập nhật: {s.updated}
-                        </span>
-                        <button
-                          onClick={() =>
-                            showToast(`Đang tải: ${s.title}`, "info")
-                          }
-                          className="text-[9px] font-black text-blue-600 uppercase hover:underline"
-                        >
-                          Tải xuống ↓
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  {filteredSheets.length === 0 && (
-                    <p className="text-[11px] text-slate-400 font-bold col-span-3 py-8 text-center">
-                      Không tìm thấy biểu mẫu nào.
+            <div className="space-y-4">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                <div className="space-y-4 flex-1">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">
+                      {branchData.name}
+                    </h2>
+                    <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">
+                      {branchData.status}
                     </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+                  </div>
 
-          {/* ─── TAB 4: FORUM / NEWS ─── */}
-          {activeTab === "forum" && (
-            <div className="flex-1 flex flex-col gap-4 overflow-hidden">
-              {/* Filter chips */}
-              <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                <span className="text-[10px] font-black text-slate-400 uppercase mr-1">
-                  Lọc:
-                </span>
-                {[
-                  { key: "all", label: "Tất cả" },
-                  { key: "salary", label: "Luật lương" },
-                  { key: "tax", label: "Thuế" },
-                  { key: "insurance", label: "Bảo hiểm" },
-                  { key: "policy", label: "Chính sách" },
-                ].map((f) => (
-                  <button
-                    key={f.key}
-                    onClick={() => setForumFilter(f.key)}
-                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition ${
-                      forumFilter === f.key
-                        ? "bg-slate-800 text-white"
-                        : "bg-slate-200 text-slate-600 hover:bg-slate-300"
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3 text-[11px]">
+                    <p className="flex items-center">
+                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
+                        Mã số:
+                      </span>
+                      <b className="text-slate-700">LR-{selectedBranch.toUpperCase()}-VN</b>
+                    </p>
+                    <p className="flex items-center">
+                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
+                        Phân loại:
+                      </span>
+                      <b className="text-slate-700">{branchData.type}</b>
+                    </p>
+                    <p className="flex items-center">
+                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
+                        Số tầng:
+                      </span>
+                      <b className="text-slate-700 text-blue-600 font-black">
+                        {branchData.floors}
+                      </b>
+                    </p>
+                    <p className="flex items-center">
+                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
+                        Số phòng:
+                      </span>
+                      <b className="text-slate-700 text-blue-600 font-black">
+                        {branchData.rooms}
+                      </b>
+                    </p>
+                    <p className="flex items-center">
+                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
+                        Nhân sự:
+                      </span>
+                      <b className="text-slate-700">{branchData.staff}</b>
+                    </p>
+                    <p className="flex items-center">
+                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
+                        Diện tích:
+                      </span>
+                      <b className="text-slate-700">{branchData.area}</b>
+                    </p>
+                    <p className="flex items-center col-span-full">
+                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
+                        Hệ thống IoT:
+                      </span>
+                      <span
+                        className={`flex items-center font-black uppercase text-[10px] ${
+                          branchData.iot.includes("Cảnh báo")
+                            ? "text-amber-600"
+                            : "text-green-600"
+                        }`}
+                      >
+                        <span
+                          className={`w-2 h-2 rounded-full animate-pulse mr-2 ${
+                            branchData.iot.includes("Cảnh báo")
+                              ? "bg-amber-500"
+                              : "bg-green-500"
+                          }`}
+                        />
+                        {branchData.iot}
+                      </span>
+                    </p>
+                    <p className="flex items-start col-span-full">
+                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
+                        Địa chỉ:
+                      </span>
+                      <b className="text-slate-700">{branchData.address}</b>
+                    </p>
+                  </div>
+
+                  <div
+                    className={`mt-2 p-2 border-l-4 rounded ${
+                      branchData.note.includes("bình thường")
+                        ? "bg-green-50 border-green-500"
+                        : "bg-red-50 border-red-500"
                     }`}
                   >
-                    {f.label}
+                    <p
+                      className={`flex items-center ${
+                        branchData.note.includes("bình thường")
+                          ? "text-green-700"
+                          : "text-red-700"
+                      }`}
+                    >
+                      <span className="font-black uppercase text-[9px] mr-3">
+                        Thông báo:
+                      </span>
+                      <span className="font-medium text-[11px]">
+                        {branchData.note}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Branch Image */}
+                <div className="shrink-0 group relative">
+                  <div className="w-64 h-40 bg-slate-200 rounded-lg overflow-hidden border-2 border-slate-300 shadow-inner">
+                    <img
+                      src={branchData.image}
+                      alt={branchData.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <button className="absolute -bottom-2 -right-2 bg-white p-2 rounded-full shadow-lg border border-slate-200 hover:bg-slate-50 transition-transform active:scale-95">
+                    <svg
+                      className="w-3.5 h-3.5 text-slate-700"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
                   </button>
-                ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab: Cơ sở hạ tầng */}
+          {activeTab === "infrastructure" && (
+            <div className="bg-white rounded border h-full flex flex-col overflow-hidden">
+              <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
+                <h3 className="font-bold text-xs uppercase tracking-tighter">
+                  Kiểm tra cơ sở hạ tầng
+                </h3>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                <table className="w-full text-[11px] text-left">
+                  <thead className="bg-slate-100 text-slate-600 sticky top-0 uppercase font-black">
+                    <tr>
+                      <th className="p-4 border-b">Hạng mục</th>
+                      <th className="p-4 border-b">Vị trí / Khu vực</th>
+                      <th className="p-4 border-b text-center">Trạng thái</th>
+                      <th className="p-4 border-b text-right">Thời gian kiểm tra</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {infraData.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50 transition">
+                        <td className="p-4 font-bold uppercase text-slate-700">
+                          {item.item}
+                        </td>
+                        <td className="p-4">{item.area}</td>
+                        <td className="p-4 text-center">
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                              item.status === "Hoạt động tốt" ||
+                              item.status === "Sẵn sàng"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="p-4 text-right font-mono text-gray-500">
+                          {item.time}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Tab: Kho bãi */}
+          {activeTab === "storage" && (
+            <div className="bg-white rounded border h-full flex flex-col overflow-hidden">
+              <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
+                <h3 className="font-bold text-xs uppercase tracking-tighter">
+                  Quản lý vật phẩm & Kho bãi
+                </h3>
+                <div className="space-x-2">
+                  <button
+                    onClick={() => setShowImportModal(true)}
+                    className="bg-slate-800 text-white px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-slate-700"
+                  >
+                    Nhập kho
+                  </button>
+                  <button className="bg-slate-200 text-slate-700 px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-slate-300">
+                    Xuất báo cáo
+                  </button>
+                </div>
               </div>
 
-              <div className="flex gap-4 flex-1 overflow-hidden min-h-0">
-                {/* News Feed */}
-                <div className="flex-1 overflow-y-auto space-y-2">
-                  {filteredForum.length === 0 && (
-                    <p className="text-[11px] text-slate-400 font-bold p-4">
-                      Không có bài viết nào.
-                    </p>
-                  )}
-                  {filteredForum.map((p) => (
+              {pendingImports.length > 0 && (
+                <div className="p-4 space-y-2 bg-slate-50 border-b">
+                  <h4 className="text-[9px] font-black text-slate-400 uppercase mb-2">
+                    Yêu cầu nhập kho đang chờ
+                  </h4>
+                  {pendingImports.map((item) => (
                     <div
-                      key={p.id}
-                      className="bg-white rounded border p-4 cursor-pointer border-l-[3px] border-l-transparent hover:bg-slate-50 hover:border-l-blue-500 transition-all"
+                      key={item.id}
+                      className="flex items-center justify-between bg-amber-50 border border-amber-200 p-3 rounded-lg shadow-sm animate-pulse mb-2"
                     >
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span
-                          className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${badgeColor(p.badge)}`}
-                        >
-                          {p.badge}
-                        </span>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase">
-                          {p.author}
-                        </span>
-                        <span className="text-[9px] font-mono text-slate-300 ml-auto">
-                          {p.date}
-                        </span>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-3 h-3 bg-amber-500 rounded-full" />
+                        <div>
+                          <h4 className="text-[11px] font-black text-slate-800 uppercase">
+                            {item.name}
+                          </h4>
+                          <p className="text-[9px] text-amber-700 font-bold uppercase">
+                            Số lượng: {item.qty} | NCC: {item.supplier}
+                          </p>
+                        </div>
                       </div>
-                      <h4 className="text-[12px] font-black text-slate-800 mb-1">
-                        {p.title}
-                      </h4>
-                      <p className="text-[10px] text-slate-500 leading-relaxed">
-                        {p.body}
-                      </p>
+                      <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
+                        Pending
+                      </span>
                     </div>
                   ))}
                 </div>
+              )}
 
-                {/* Sidebar: Pinned + Deadlines */}
-                <div className="w-64 shrink-0 space-y-4 overflow-y-auto">
-                  <div className="bg-white rounded border p-4">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                      📌 Ghim quan trọng
-                    </p>
-                    <div className="space-y-2">
-                      {pinnedPosts.map((p) => (
-                        <div
-                          key={p.id}
-                          className="border-b pb-2 last:border-0 cursor-pointer"
-                        >
-                          <p className="text-[10px] font-bold text-slate-700 hover:text-blue-600 leading-snug transition">
-                            {p.title}
-                          </p>
-                          <p className="text-[9px] font-mono text-slate-400 mt-0.5">
-                            {p.date}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="bg-slate-800 rounded p-4 text-white">
-                    <p className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-3">
-                      Hiệu lực sắp tới
-                    </p>
-                    <ul className="space-y-2 text-[10px] text-slate-300 font-bold">
-                      <li className="flex justify-between">
-                        <span>Lương tối thiểu mới</span>
-                        <span className="text-amber-400">01/07/2026</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>Điều chỉnh BHXH</span>
-                        <span className="text-amber-400">01/01/2027</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>Quyết toán thuế TNCN</span>
-                        <span className="text-amber-400">31/03/2027</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+              <div className="flex-1 overflow-y-auto">
+                <table className="w-full text-[11px] text-left">
+                  <thead className="bg-slate-100 text-slate-600 sticky top-0 uppercase font-black">
+                    <tr>
+                      <th className="p-4 border-b">Vật phẩm</th>
+                      <th className="p-4 border-b text-center">Số lượng</th>
+                      <th className="p-4 border-b text-center">Ngưỡng tối thiểu</th>
+                      <th className="p-4 border-b text-center">Đánh giá</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {warehouseData.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50 transition">
+                        <td className="p-4 font-bold uppercase text-slate-700">
+                          {item.name}
+                        </td>
+                        <td className="p-4 text-center font-mono text-lg">
+                          {item.qty}
+                        </td>
+                        <td className="p-4 text-center text-gray-400 font-bold uppercase">
+                          {item.min}
+                        </td>
+                        <td className="p-4 text-center">
+                          <span
+                            className={`px-2 py-1 rounded text-[9px] font-black uppercase ${
+                              item.qty >= item.min
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-amber-100 text-amber-700"
+                            }`}
+                          >
+                            {item.rating}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Tab: Dịch vụ */}
+          {activeTab === "services" && (
+            <div className="bg-white rounded border h-full flex flex-col overflow-hidden">
+              <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
+                <h3 className="font-bold text-xs uppercase tracking-tighter">
+                  Danh sách dịch vụ hoạt động
+                </h3>
+                <button className="bg-blue-600 text-white px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-blue-700">
+                  Cập nhật dịch vụ
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                <table className="w-full text-[11px] text-left">
+                  <thead className="bg-slate-100 text-slate-600 sticky top-0 uppercase font-black">
+                    <tr>
+                      <th className="p-4 border-b">Tên dịch vụ</th>
+                      <th className="p-4 border-b">Đơn giá</th>
+                      <th className="p-4 border-b text-center">Trạng thái</th>
+                      <th className="p-4 border-b">Lý do (nếu tạm ngưng)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {servicesData.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50 transition">
+                        <td className="p-4 font-bold uppercase text-slate-700">
+                          {item.name}
+                        </td>
+                        <td className="p-4 font-bold text-blue-600">
+                          {item.price}
+                        </td>
+                        <td className="p-4 text-center">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
+                              item.status === "Hoạt động"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-gray-100 text-gray-500"
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="p-4 italic text-gray-400">
+                          {item.reason}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
         </section>
       </main>
 
-      {/* ─── BILL MODAL ─── */}
-      {isBillModalOpen && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+      {/* Import Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
             <div className="p-4 border-b bg-slate-50 flex justify-between items-center">
               <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">
-                Thêm hoá đơn / Khoản thuế mới
+                Phiếu nhập kho mới
               </h3>
               <button
-                onClick={() => setIsBillModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 text-lg"
+                onClick={() => setShowImportModal(false)}
+                className="text-slate-400 hover:text-slate-600"
               >
                 ✕
               </button>
             </div>
             <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Loại
-                  </label>
-                  <select
-                    value={billForm.type}
-                    onChange={(e) =>
-                      setBillForm((f) => ({ ...f, type: e.target.value }))
-                    }
-                    className="w-full border rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                  >
-                    <option>Thuế TNCN</option>
-                    <option>Thuế GTGT</option>
-                    <option>BHXH</option>
-                    <option>Điện / Nước</option>
-                    <option>Khác</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Đơn vị phát hành
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="VD: Cục thuế Q4"
-                    value={billForm.issuer}
-                    onChange={(e) =>
-                      setBillForm((f) => ({ ...f, issuer: e.target.value }))
-                    }
-                    className="w-full border rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                  Tên vật phẩm
+                </label>
+                <input
+                  type="text"
+                  value={importFormData.itemName}
+                  onChange={(e) =>
+                    setImportFormData({
+                      ...importFormData,
+                      itemName: e.target.value,
+                    })
+                  }
+                  className="w-full border rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="VD: Khăn tắm loại A"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Số tiền (VND)
+                    Số lượng
                   </label>
                   <input
                     type="number"
-                    placeholder="0"
-                    value={billForm.amount}
+                    value={importFormData.itemQty}
                     onChange={(e) =>
-                      setBillForm((f) => ({ ...f, amount: e.target.value }))
+                      setImportFormData({
+                        ...importFormData,
+                        itemQty: e.target.value,
+                      })
                     }
                     className="w-full border rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                    placeholder="0"
                   />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Hạn nộp
+                    Nhà phân phối
                   </label>
                   <input
-                    type="date"
-                    value={billForm.due}
+                    type="text"
+                    value={importFormData.itemSupplier}
                     onChange={(e) =>
-                      setBillForm((f) => ({ ...f, due: e.target.value }))
+                      setImportFormData({
+                        ...importFormData,
+                        itemSupplier: e.target.value,
+                      })
                     }
                     className="w-full border rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                    placeholder="Tên NCC"
                   />
                 </div>
               </div>
               <button
-                onClick={addBill}
-                className="w-full bg-amber-500 text-white font-black py-3 rounded uppercase text-xs tracking-widest hover:bg-amber-600 transition"
+                onClick={handleImportSubmit}
+                className="w-full bg-blue-600 text-white font-black py-3 rounded uppercase text-xs tracking-widest hover:bg-blue-700 transition"
               >
-                Xác nhận thêm hoá đơn
+                Xác nhận nhập kho
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* TOAST */}
-      {toast.visible && (
-        <div
-          className={`fixed bottom-5 right-5 px-6 py-3 rounded-xl text-white shadow-2xl z-1000 text-sm font-bold transition-all ${
-            toast.type === "error"
-              ? "bg-red-500"
-              : toast.type === "info"
-                ? "bg-blue-500"
-                : "bg-emerald-500"
-          }`}
-        >
-          {toast.message}
         </div>
       )}
     </div>

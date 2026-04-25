@@ -32,6 +32,7 @@ ChartJS.register(
 );
 
 export default function AdminPage() {
+  const router = useRouter();
   const {
     admin,
     isChecking,

@@ -32,25 +32,19 @@ ChartJS.register(
 import { useAdminDashboard } from "@/components/useAdminDashboard"; // Đảm bảo đúng đường dẫn
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
-type InfrastorageTab = "overview" | "branch" | "infrastructure" | "storage" | "services";
+type InfrastorageTab =
+  | "overview"
+  | "branch"
+  | "infrastructure"
+  | "storage"
+  | "services";
 type BuildingStatus = "Active" | "Maintenance" | "Closed";
 type RoomStatus = "Available" | "Occupied" | "Maintenance" | "Reserved";
 type StorageItemStatus = "InStock" | "LowStock" | "OutOfStock";
 type ServiceStatus = "Active" | "Inactive";
-type BuildingType =
-  | "Hotel"
-  | "Resort"
-  | "Villa"
-  | "Apartment"
-  | "MixedUse";
+type BuildingType = "Hotel" | "Resort" | "Villa" | "Apartment" | "MixedUse";
 
-type RoomType =
-  | "Standard"
-  | "Deluxe"
-  | "Suite"
-  | "Conference"
-  | "ServiceRoom";
-
+type RoomType = "Standard" | "Deluxe" | "Suite" | "Conference" | "ServiceRoom";
 
 //---- Interface Building
 
@@ -161,7 +155,9 @@ const infraData = data as InfraStorageData;
 export default function InfastoragePage() {
   const { isDarkMode } = useDarkMode();
   const [activeTab, setActiveTab] = useState<InfrastorageTab>("overview");
-  const [selectedBranch, setSelectedBranch] = useState(infraData.branches[0]?.id || "");
+  const [selectedBranch, setSelectedBranch] = useState(
+    infraData.branches[0]?.id || "",
+  );
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [pendingImports, setPendingImports] = useState<any[]>([]);
@@ -215,23 +211,16 @@ export default function InfastoragePage() {
   };
 
   return (
-    <div className={`${isDarkMode ? "dark" : ""} bg-slate-100 dark:bg-slate-900 transition-colors duration-300 h-screen flex flex-col`}>
+    <div
+      className={`${isDarkMode ? "dark" : ""} bg-slate-100 dark:bg-slate-900 transition-colors duration-300 h-screen flex flex-col`}
+    >
       {/* HEADER */}
       <header className="bg-slate-900 px-6 py-3 flex sticky top-0 z-50 shadow-md">
         <div className="flex items-center space-x-4">
           <div className="border-l border-slate-700 pl-4">
-            <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">
-              {currentDateTime}
-            </span>
             <h1 className="text-sm font-black text-white uppercase">
               Quản lý hạ tầng & Dịch vụ
             </h1>
-          </div>
-        </div>
-        <div className="ml-auto flex items-center space-x-2">
-          <span className="text-xs font-bold text-slate-300">Admin</span>
-          <div className="w-8 h-8 rounded-full bg-slate-700 text-white flex items-center justify-center text-[10px] font-bold">
-            INF
           </div>
         </div>
       </header>
@@ -294,11 +283,13 @@ export default function InfastoragePage() {
                       {getCurrentBranchData()?.status}
                     </p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${
-                    getCurrentBranchData()?.status === "Active" 
-                      ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" 
-                      : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
-                  }`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${
+                      getCurrentBranchData()?.status === "Active"
+                        ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                        : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                    }`}
+                  >
                     {getCurrentBranchData()?.status}
                   </span>
                 </div>
@@ -380,7 +371,8 @@ export default function InfastoragePage() {
                     Địa chỉ
                   </label>
                   <p className="text-[13px] font-bold text-slate-800 dark:text-slate-100">
-                    {getCurrentBranchData()?.address}, {getCurrentBranchData()?.city},{" "}
+                    {getCurrentBranchData()?.address},{" "}
+                    {getCurrentBranchData()?.city},{" "}
                     {getCurrentBranchData()?.country}
                   </p>
                 </div>
@@ -409,22 +401,39 @@ export default function InfastoragePage() {
                 <table className="w-full text-[11px] text-left">
                   <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 sticky top-0 uppercase font-black">
                     <tr>
-                      <th className="p-4 border-b dark:border-slate-600">Tên phòng</th>
-                      <th className="p-4 border-b dark:border-slate-600">Loại</th>
-                      <th className="p-4 border-b dark:border-slate-600 text-center">Sức chứa</th>
-                      <th className="p-4 border-b dark:border-slate-600">Trạng thái</th>
-                      <th className="p-4 border-b dark:border-slate-600 text-right">Giá/đêm</th>
+                      <th className="p-4 border-b dark:border-slate-600">
+                        Tên phòng
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600">
+                        Loại
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">
+                        Sức chứa
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600">
+                        Trạng thái
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600 text-right">
+                        Giá/đêm
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y dark:divide-slate-600">
                     {getCurrentInfrastructures().length > 0 ? (
                       getCurrentInfrastructures().map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-600 transition">
+                        <tr
+                          key={item.id}
+                          className="hover:bg-slate-50 dark:hover:bg-slate-600 transition"
+                        >
                           <td className="p-4 font-bold uppercase text-slate-700 dark:text-slate-200">
                             {item.name}
                           </td>
-                          <td className="p-4 text-slate-700 dark:text-slate-300">{item.type}</td>
-                          <td className="p-4 text-center font-mono text-slate-700 dark:text-slate-300">{item.capacity}</td>
+                          <td className="p-4 text-slate-700 dark:text-slate-300">
+                            {item.type}
+                          </td>
+                          <td className="p-4 text-center font-mono text-slate-700 dark:text-slate-300">
+                            {item.capacity}
+                          </td>
                           <td className="p-4 text-center">
                             <span
                               className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
@@ -447,7 +456,10 @@ export default function InfastoragePage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="p-4 text-center text-gray-500 dark:text-gray-400">
+                        <td
+                          colSpan={5}
+                          className="p-4 text-center text-gray-500 dark:text-gray-400"
+                        >
                           Không có dữ liệu
                         </td>
                       </tr>
@@ -511,21 +523,36 @@ export default function InfastoragePage() {
                 <table className="w-full text-[11px] text-left">
                   <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 sticky top-0 uppercase font-black">
                     <tr>
-                      <th className="p-4 border-b dark:border-slate-600">Vật phẩm</th>
-                      <th className="p-4 border-b dark:border-slate-600">Danh mục</th>
-                      <th className="p-4 border-b dark:border-slate-600 text-center">Số lượng</th>
-                      <th className="p-4 border-b dark:border-slate-600 text-center">Ngưỡng tối thiểu</th>
-                      <th className="p-4 border-b dark:border-slate-600 text-center">Trạng thái</th>
+                      <th className="p-4 border-b dark:border-slate-600">
+                        Vật phẩm
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600">
+                        Danh mục
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">
+                        Số lượng
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">
+                        Ngưỡng tối thiểu
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">
+                        Trạng thái
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y dark:divide-slate-600">
                     {getCurrentStorageItems().length > 0 ? (
                       getCurrentStorageItems().map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-600 transition">
+                        <tr
+                          key={item.id}
+                          className="hover:bg-slate-50 dark:hover:bg-slate-600 transition"
+                        >
                           <td className="p-4 font-bold uppercase text-slate-700 dark:text-slate-200">
                             {item.name}
                           </td>
-                          <td className="p-4 text-slate-700 dark:text-slate-300">{item.category}</td>
+                          <td className="p-4 text-slate-700 dark:text-slate-300">
+                            {item.category}
+                          </td>
                           <td className="p-4 text-center font-mono text-lg text-slate-700 dark:text-slate-300">
                             {item.quantity} {item.unit}
                           </td>
@@ -553,7 +580,10 @@ export default function InfastoragePage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="p-4 text-center text-gray-500 dark:text-gray-400">
+                        <td
+                          colSpan={5}
+                          className="p-4 text-center text-gray-500 dark:text-gray-400"
+                        >
                           Không có dữ liệu
                         </td>
                       </tr>
@@ -579,20 +609,33 @@ export default function InfastoragePage() {
                 <table className="w-full text-[11px] text-left">
                   <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 sticky top-0 uppercase font-black">
                     <tr>
-                      <th className="p-4 border-b dark:border-slate-600">Tên dịch vụ</th>
-                      <th className="p-4 border-b dark:border-slate-600">Danh mục</th>
-                      <th className="p-4 border-b dark:border-slate-600">Đơn giá</th>
-                      <th className="p-4 border-b dark:border-slate-600 text-center">Trạng thái</th>
+                      <th className="p-4 border-b dark:border-slate-600">
+                        Tên dịch vụ
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600">
+                        Danh mục
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600">
+                        Đơn giá
+                      </th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">
+                        Trạng thái
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y dark:divide-slate-600">
                     {getCurrentServices().length > 0 ? (
                       getCurrentServices().map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-600 transition">
+                        <tr
+                          key={item.id}
+                          className="hover:bg-slate-50 dark:hover:bg-slate-600 transition"
+                        >
                           <td className="p-4 font-bold uppercase text-slate-700 dark:text-slate-200">
                             {item.name}
                           </td>
-                          <td className="p-4 text-slate-700 dark:text-slate-300">{item.category}</td>
+                          <td className="p-4 text-slate-700 dark:text-slate-300">
+                            {item.category}
+                          </td>
                           <td className="p-4 font-bold text-blue-600 dark:text-blue-400">
                             ${item.price} {item.unit}
                           </td>
@@ -611,7 +654,10 @@ export default function InfastoragePage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="p-4 text-center text-gray-500 dark:text-gray-400">
+                        <td
+                          colSpan={4}
+                          className="p-4 text-center text-gray-500 dark:text-gray-400"
+                        >
                           Không có dữ liệu
                         </td>
                       </tr>

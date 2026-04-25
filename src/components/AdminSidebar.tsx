@@ -133,23 +133,7 @@ export default function AdminSidebar({
         </div>
       </nav>
 
-      {/* FOOTER - DARK MODE */}
-      <div className="p-4 border-t border-gray-700 bg-gray-900/50">
-        <div className="flex justify-between items-center px-2">
-          <div className="flex items-center gap-2 text-gray-400 text-xs">
-            <i className={`fas ${isDarkMode ? "fa-moon" : "fa-sun"}`}></i>
-            <span>Giao diện tối</span>
-          </div>
-          <label className="switch">
-            <input
-              type="checkbox"
-              checked={isDarkMode}
-              onChange={toggleDarkMode}
-            />
-            <span className="slider"></span>
-          </label>
-        </div>
-      </div>
+      
     </aside>
   );
 }

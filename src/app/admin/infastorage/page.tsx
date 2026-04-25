@@ -270,7 +270,7 @@ export default function InfastoragePage() {
             <select
               value={selectedBranch}
               onChange={(e) => setSelectedBranch(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 text-slate-200 text-[11px] font-bold uppercase rounded p-2 focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer"
+              className="w-full max-w-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-100 text-[11px] font-bold uppercase rounded p-2 focus:ring-1 focus:ring-blue-500 outline-none cursor-pointer"
             >
               {infraData.branches.map((branch) => (
                 <option key={branch.id} value={branch.id}>
@@ -282,119 +282,116 @@ export default function InfastoragePage() {
 
           {/* Tab: Tổng quan chi nhánh */}
           {activeTab === "overview" && getCurrentBranchData() && (
-            <div className="space-y-4">
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                <div className="space-y-4 flex-1">
+            <div className="space-y-6 max-w-5xl">
+              {/* Branch Header Card */}
+              <div className="bg-white dark:bg-slate-700 p-6 rounded-xl shadow-sm">
+                <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">
+                    <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight mb-1">
                       {getCurrentBranchData()?.name}
                     </h2>
-                    <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">
+                    <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">
                       {getCurrentBranchData()?.status}
                     </p>
                   </div>
+                  <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${
+                    getCurrentBranchData()?.status === "Active" 
+                      ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" 
+                      : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                  }`}>
+                    {getCurrentBranchData()?.status}
+                  </span>
+                </div>
+              </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3 text-[11px]">
-                    <p className="flex items-center">
-                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
-                        Mã số:
-                      </span>
-                      <b className="text-slate-700">{getCurrentBranchData()?.id}</b>
-                    </p>
-                    <p className="flex items-center">
-                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
-                        Phân loại:
-                      </span>
-                      <b className="text-slate-700">{getCurrentBranchData()?.type}</b>
-                    </p>
-                    <p className="flex items-center">
-                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
-                        Số tầng:
-                      </span>
-                      <b className="text-blue-600 font-black">
-                        {getCurrentBranchData()?.totalFloors}
-                      </b>
-                    </p>
-                    <p className="flex items-center">
-                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
-                        Số phòng:
-                      </span>
-                      <b className="text-blue-600 font-black">
-                        {getCurrentBranchData()?.totalRooms}
-                      </b>
-                    </p>
-                    <p className="flex items-center">
-                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
-                        Nhân sự:
-                      </span>
-                      <b className="text-slate-700">{getCurrentBranchData()?.staffCount}</b>
-                    </p>
-                    <p className="flex items-center">
-                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
-                        Diện tích:
-                      </span>
-                      <b className="text-slate-700">{getCurrentBranchData()?.totalArea} m²</b>
-                    </p>
-                    <p className="flex items-center col-span-full">
-                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
-                        Người quản lý:
-                      </span>
-                      <span className="flex items-center font-black uppercase text-[10px] text-green-600">
-                        <span className="w-2 h-2 rounded-full animate-pulse mr-2 bg-green-500" />
-                        {getCurrentBranchData()?.managedBy}
-                      </span>
-                    </p>
-                    <p className="flex items-start col-span-full">
-                      <span className="text-gray-400 font-bold uppercase text-[9px] w-24 shrink-0">
-                        Địa chỉ:
-                      </span>
-                      <b className="text-slate-700">
-                        {getCurrentBranchData()?.address}, {getCurrentBranchData()?.city},{" "}
-                        {getCurrentBranchData()?.country}
-                      </b>
-                    </p>
-                  </div>
+              {/* Branch Info Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl shadow-sm">
+                  <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-2">
+                    Mã số
+                  </label>
+                  <p className="text-[13px] font-bold text-slate-800 dark:text-slate-100">
+                    {getCurrentBranchData()?.id}
+                  </p>
+                </div>
 
-                  <div className="mt-2 p-2 border-l-4 bg-green-50 border-green-500 rounded">
-                    <p className="flex items-center text-green-700">
-                      <span className="font-black uppercase text-[9px] mr-3">Ngày khai trương:</span>
-                      <span className="font-medium text-[11px]">
-                        {getCurrentBranchData()?.openingDate}
-                      </span>
+                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl shadow-sm">
+                  <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-2">
+                    Phân loại
+                  </label>
+                  <p className="text-[13px] font-bold text-slate-800 dark:text-slate-100">
+                    {getCurrentBranchData()?.type}
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl shadow-sm">
+                  <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-2">
+                    Số tầng
+                  </label>
+                  <p className="text-[13px] font-bold text-blue-600 dark:text-blue-400">
+                    {getCurrentBranchData()?.totalFloors}
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl shadow-sm">
+                  <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-2">
+                    Số phòng
+                  </label>
+                  <p className="text-[13px] font-bold text-blue-600 dark:text-blue-400">
+                    {getCurrentBranchData()?.totalRooms}
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl shadow-sm">
+                  <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-2">
+                    Nhân sự
+                  </label>
+                  <p className="text-[13px] font-bold text-slate-800 dark:text-slate-100">
+                    {getCurrentBranchData()?.staffCount}
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl shadow-sm">
+                  <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-2">
+                    Diện tích
+                  </label>
+                  <p className="text-[13px] font-bold text-slate-800 dark:text-slate-100">
+                    {getCurrentBranchData()?.totalArea} m²
+                  </p>
+                </div>
+              </div>
+
+              {/* Extended Info Cards */}
+              <div className="space-y-4">
+                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl shadow-sm">
+                  <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-2">
+                    Người quản lý
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full animate-pulse bg-green-500" />
+                    <p className="text-[13px] font-bold text-green-600 dark:text-green-400 uppercase">
+                      {getCurrentBranchData()?.managedBy}
                     </p>
                   </div>
                 </div>
 
-                {/* Branch Image */}
-                <div className="shrink-0 group relative">
-                  <div className="w-64 h-40 bg-slate-200 rounded-lg overflow-hidden border-2 border-slate-300 shadow-inner">
-                    <img
-                      src={`https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&auto=format&fit=crop`}
-                      alt={getCurrentBranchData()?.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <button className="absolute -bottom-2 -right-2 bg-white p-2 rounded-full shadow-lg border border-slate-200 hover:bg-slate-50 transition-transform active:scale-95">
-                    <svg
-                      className="w-3.5 h-3.5 text-slate-700"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                  </button>
+                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl shadow-sm">
+                  <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-2">
+                    Địa chỉ
+                  </label>
+                  <p className="text-[13px] font-bold text-slate-800 dark:text-slate-100">
+                    {getCurrentBranchData()?.address}, {getCurrentBranchData()?.city},{" "}
+                    {getCurrentBranchData()?.country}
+                  </p>
+                </div>
+
+                <div className="bg-white dark:bg-slate-700 p-4 rounded-xl shadow-sm border-l-4 border-green-500">
+                  <label className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-2">
+                    Ngày khai trương
+                  </label>
+                  <p className="text-[13px] font-bold text-slate-800 dark:text-slate-100">
+                    {getCurrentBranchData()?.openingDate}
+                  </p>
                 </div>
               </div>
             </div>
@@ -402,55 +399,55 @@ export default function InfastoragePage() {
 
           {/* Tab: Cơ sở hạ tầng */}
           {activeTab === "infrastructure" && (
-            <div className="bg-white rounded border h-full flex flex-col overflow-hidden">
-              <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                <h3 className="font-bold text-xs uppercase tracking-tighter">
+            <div className="bg-white dark:bg-slate-700 rounded border dark:border-slate-600 h-full flex flex-col overflow-hidden">
+              <div className="p-4 border-b dark:border-slate-600 bg-gray-50 dark:bg-slate-800 flex justify-between items-center">
+                <h3 className="font-bold text-xs uppercase tracking-tighter text-slate-800 dark:text-slate-100">
                   Danh sách phòng & cơ sở hạ tầng
                 </h3>
               </div>
               <div className="flex-1 overflow-y-auto">
                 <table className="w-full text-[11px] text-left">
-                  <thead className="bg-slate-100 text-slate-600 sticky top-0 uppercase font-black">
+                  <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 sticky top-0 uppercase font-black">
                     <tr>
-                      <th className="p-4 border-b">Tên phòng</th>
-                      <th className="p-4 border-b">Loại</th>
-                      <th className="p-4 border-b text-center">Sức chứa</th>
-                      <th className="p-4 border-b">Trạng thái</th>
-                      <th className="p-4 border-b text-right">Giá/đêm</th>
+                      <th className="p-4 border-b dark:border-slate-600">Tên phòng</th>
+                      <th className="p-4 border-b dark:border-slate-600">Loại</th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">Sức chứa</th>
+                      <th className="p-4 border-b dark:border-slate-600">Trạng thái</th>
+                      <th className="p-4 border-b dark:border-slate-600 text-right">Giá/đêm</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y dark:divide-slate-600">
                     {getCurrentInfrastructures().length > 0 ? (
                       getCurrentInfrastructures().map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 transition">
-                          <td className="p-4 font-bold uppercase text-slate-700">
+                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-600 transition">
+                          <td className="p-4 font-bold uppercase text-slate-700 dark:text-slate-200">
                             {item.name}
                           </td>
-                          <td className="p-4">{item.type}</td>
-                          <td className="p-4 text-center font-mono">{item.capacity}</td>
+                          <td className="p-4 text-slate-700 dark:text-slate-300">{item.type}</td>
+                          <td className="p-4 text-center font-mono text-slate-700 dark:text-slate-300">{item.capacity}</td>
                           <td className="p-4 text-center">
                             <span
                               className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
                                 item.status === "Available"
-                                  ? "bg-green-100 text-green-700"
+                                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                                   : item.status === "Occupied"
-                                    ? "bg-blue-100 text-blue-700"
+                                    ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                                     : item.status === "Maintenance"
-                                      ? "bg-amber-100 text-amber-700"
-                                      : "bg-gray-100 text-gray-700"
+                                      ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                                      : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                               }`}
                             >
                               {item.status}
                             </span>
                           </td>
-                          <td className="p-4 text-right font-bold text-blue-600">
+                          <td className="p-4 text-right font-bold text-blue-600 dark:text-blue-400">
                             ${item.pricePerNight}
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="p-4 text-center text-gray-500">
+                        <td colSpan={5} className="p-4 text-center text-gray-500 dark:text-gray-400">
                           Không có dữ liệu
                         </td>
                       </tr>
@@ -463,46 +460,46 @@ export default function InfastoragePage() {
 
           {/* Tab: Kho bãi */}
           {activeTab === "storage" && (
-            <div className="bg-white rounded border h-full flex flex-col overflow-hidden">
-              <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                <h3 className="font-bold text-xs uppercase tracking-tighter">
+            <div className="bg-white dark:bg-slate-700 rounded border dark:border-slate-600 h-full flex flex-col overflow-hidden">
+              <div className="p-4 border-b dark:border-slate-600 bg-gray-50 dark:bg-slate-800 flex justify-between items-center">
+                <h3 className="font-bold text-xs uppercase tracking-tighter text-slate-800 dark:text-slate-100">
                   Quản lý vật phẩm & Kho bãi
                 </h3>
                 <div className="space-x-2">
                   <button
                     onClick={() => setShowImportModal(true)}
-                    className="bg-slate-800 text-white px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-slate-700"
+                    className="bg-slate-800 dark:bg-slate-600 text-white px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-slate-700 dark:hover:bg-slate-500"
                   >
                     Nhập kho
                   </button>
-                  <button className="bg-slate-200 text-slate-700 px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-slate-300">
+                  <button className="bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-slate-300 dark:hover:bg-slate-500">
                     Xuất báo cáo
                   </button>
                 </div>
               </div>
 
               {pendingImports.length > 0 && (
-                <div className="p-4 space-y-2 bg-slate-50 border-b">
-                  <h4 className="text-[9px] font-black text-slate-400 uppercase mb-2">
+                <div className="p-4 space-y-2 bg-slate-50 dark:bg-slate-800 border-b dark:border-slate-600">
+                  <h4 className="text-[9px] font-black text-slate-400 dark:text-slate-400 uppercase mb-2">
                     Yêu cầu nhập kho đang chờ
                   </h4>
                   {pendingImports.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between bg-amber-50 border border-amber-200 p-3 rounded-lg shadow-sm animate-pulse mb-2"
+                      className="flex items-center justify-between bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-3 rounded-lg shadow-sm animate-pulse mb-2"
                     >
                       <div className="flex items-center space-x-3">
                         <div className="w-3 h-3 bg-amber-500 rounded-full" />
                         <div>
-                          <h4 className="text-[11px] font-black text-slate-800 uppercase">
+                          <h4 className="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase">
                             {item.name}
                           </h4>
-                          <p className="text-[9px] text-amber-700 font-bold uppercase">
+                          <p className="text-[9px] text-amber-700 dark:text-amber-400 font-bold uppercase">
                             Số lượng: {item.qty} | NCC: {item.supplier}
                           </p>
                         </div>
                       </div>
-                      <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">
+                      <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
                         Pending
                       </span>
                     </div>
@@ -512,37 +509,37 @@ export default function InfastoragePage() {
 
               <div className="flex-1 overflow-y-auto">
                 <table className="w-full text-[11px] text-left">
-                  <thead className="bg-slate-100 text-slate-600 sticky top-0 uppercase font-black">
+                  <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 sticky top-0 uppercase font-black">
                     <tr>
-                      <th className="p-4 border-b">Vật phẩm</th>
-                      <th className="p-4 border-b">Danh mục</th>
-                      <th className="p-4 border-b text-center">Số lượng</th>
-                      <th className="p-4 border-b text-center">Ngưỡng tối thiểu</th>
-                      <th className="p-4 border-b text-center">Trạng thái</th>
+                      <th className="p-4 border-b dark:border-slate-600">Vật phẩm</th>
+                      <th className="p-4 border-b dark:border-slate-600">Danh mục</th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">Số lượng</th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">Ngưỡng tối thiểu</th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">Trạng thái</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y dark:divide-slate-600">
                     {getCurrentStorageItems().length > 0 ? (
                       getCurrentStorageItems().map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 transition">
-                          <td className="p-4 font-bold uppercase text-slate-700">
+                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-600 transition">
+                          <td className="p-4 font-bold uppercase text-slate-700 dark:text-slate-200">
                             {item.name}
                           </td>
-                          <td className="p-4 text-sm">{item.category}</td>
-                          <td className="p-4 text-center font-mono text-lg">
+                          <td className="p-4 text-slate-700 dark:text-slate-300">{item.category}</td>
+                          <td className="p-4 text-center font-mono text-lg text-slate-700 dark:text-slate-300">
                             {item.quantity} {item.unit}
                           </td>
-                          <td className="p-4 text-center text-gray-400 font-bold uppercase">
+                          <td className="p-4 text-center text-gray-400 dark:text-gray-500 font-bold uppercase">
                             {item.minThreshold}
                           </td>
                           <td className="p-4 text-center">
                             <span
                               className={`px-2 py-1 rounded text-[9px] font-black uppercase ${
                                 item.status === "InStock"
-                                  ? "bg-green-100 text-green-700"
+                                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                                   : item.status === "LowStock"
-                                    ? "bg-amber-100 text-amber-700"
-                                    : "bg-red-100 text-red-700"
+                                    ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
+                                    : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                               }`}
                             >
                               {item.status === "InStock"
@@ -556,7 +553,7 @@ export default function InfastoragePage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="p-4 text-center text-gray-500">
+                        <td colSpan={5} className="p-4 text-center text-gray-500 dark:text-gray-400">
                           Không có dữ liệu
                         </td>
                       </tr>
@@ -569,42 +566,42 @@ export default function InfastoragePage() {
 
           {/* Tab: Dịch vụ */}
           {activeTab === "services" && (
-            <div className="bg-white rounded border h-full flex flex-col overflow-hidden">
-              <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                <h3 className="font-bold text-xs uppercase tracking-tighter">
+            <div className="bg-white dark:bg-slate-700 rounded border dark:border-slate-600 h-full flex flex-col overflow-hidden">
+              <div className="p-4 border-b dark:border-slate-600 bg-gray-50 dark:bg-slate-800 flex justify-between items-center">
+                <h3 className="font-bold text-xs uppercase tracking-tighter text-slate-800 dark:text-slate-100">
                   Danh sách dịch vụ hoạt động
                 </h3>
-                <button className="bg-blue-600 text-white px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-blue-700">
+                <button className="bg-blue-600 dark:bg-blue-600 text-white px-3 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-blue-700 dark:hover:bg-blue-700">
                   Cập nhật dịch vụ
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto">
                 <table className="w-full text-[11px] text-left">
-                  <thead className="bg-slate-100 text-slate-600 sticky top-0 uppercase font-black">
+                  <thead className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 sticky top-0 uppercase font-black">
                     <tr>
-                      <th className="p-4 border-b">Tên dịch vụ</th>
-                      <th className="p-4 border-b">Danh mục</th>
-                      <th className="p-4 border-b">Đơn giá</th>
-                      <th className="p-4 border-b text-center">Trạng thái</th>
+                      <th className="p-4 border-b dark:border-slate-600">Tên dịch vụ</th>
+                      <th className="p-4 border-b dark:border-slate-600">Danh mục</th>
+                      <th className="p-4 border-b dark:border-slate-600">Đơn giá</th>
+                      <th className="p-4 border-b dark:border-slate-600 text-center">Trạng thái</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y dark:divide-slate-600">
                     {getCurrentServices().length > 0 ? (
                       getCurrentServices().map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50 transition">
-                          <td className="p-4 font-bold uppercase text-slate-700">
+                        <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-600 transition">
+                          <td className="p-4 font-bold uppercase text-slate-700 dark:text-slate-200">
                             {item.name}
                           </td>
-                          <td className="p-4 text-sm">{item.category}</td>
-                          <td className="p-4 font-bold text-blue-600">
+                          <td className="p-4 text-slate-700 dark:text-slate-300">{item.category}</td>
+                          <td className="p-4 font-bold text-blue-600 dark:text-blue-400">
                             ${item.price} {item.unit}
                           </td>
                           <td className="p-4 text-center">
                             <span
                               className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
                                 item.status === "Active"
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-gray-100 text-gray-500"
+                                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                                  : "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
                               }`}
                             >
                               {item.status === "Active" ? "Hoạt động" : "Ngưng"}
@@ -614,7 +611,7 @@ export default function InfastoragePage() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="p-4 text-center text-gray-500">
+                        <td colSpan={4} className="p-4 text-center text-gray-500 dark:text-gray-400">
                           Không có dữ liệu
                         </td>
                       </tr>
@@ -630,21 +627,21 @@ export default function InfastoragePage() {
       {/* Import Modal */}
       {showImportModal && (
         <div className="fixed inset-0 bg-black/60 z-100 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-            <div className="p-4 border-b bg-slate-50 flex justify-between items-center">
-              <h3 className="font-black text-xs uppercase tracking-widest text-slate-800">
+          <div className="bg-white dark:bg-slate-700 rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+            <div className="p-4 border-b dark:border-slate-600 bg-slate-50 dark:bg-slate-800 flex justify-between items-center">
+              <h3 className="font-black text-xs uppercase tracking-widest text-slate-800 dark:text-slate-100">
                 Phiếu nhập kho mới
               </h3>
               <button
                 onClick={() => setShowImportModal(false)}
-                className="text-slate-400 hover:text-slate-600"
+                className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
               >
                 ✕
               </button>
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase mb-1">
                   Tên vật phẩm
                 </label>
                 <input
@@ -656,13 +653,13 @@ export default function InfastoragePage() {
                       itemName: e.target.value,
                     })
                   }
-                  className="w-full border rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
                   placeholder="VD: Khăn tắm loại A"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                  <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase mb-1">
                     Số lượng
                   </label>
                   <input
@@ -674,12 +671,12 @@ export default function InfastoragePage() {
                         itemQty: e.target.value,
                       })
                     }
-                    className="w-full border rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
                     placeholder="0"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                  <label className="block text-[10px] font-bold text-slate-400 dark:text-slate-400 uppercase mb-1">
                     Nhà phân phối
                   </label>
                   <input
@@ -691,14 +688,14 @@ export default function InfastoragePage() {
                         itemSupplier: e.target.value,
                       })
                     }
-                    className="w-full border rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full border border-slate-300 dark:border-slate-500 bg-white dark:bg-slate-600 text-slate-900 dark:text-slate-100 rounded p-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
                     placeholder="Tên NCC"
                   />
                 </div>
               </div>
               <button
                 onClick={handleImportSubmit}
-                className="w-full bg-blue-600 text-white font-black py-3 rounded uppercase text-xs tracking-widest hover:bg-blue-700 transition"
+                className="w-full bg-blue-600 dark:bg-blue-600 text-white font-black py-3 rounded uppercase text-xs tracking-widest hover:bg-blue-700 dark:hover:bg-blue-700 transition"
               >
                 Xác nhận nhập kho
               </button>

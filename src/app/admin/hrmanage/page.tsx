@@ -1,6 +1,35 @@
-import React, { useState, useEffect } from "react";
-// Giả định đường dẫn import data của bạn
-// import staffDataRaw from '../data/destinationdatafile.json';
+"use client";
+
+import { useDarkMode } from "@/contexts/DarkModeContext"; // thay useAdminDashboard bằng context
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Line, Bar, Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend,
+);
+import { useAdminDashboard } from "@/components/useAdminDashboard";
 
 interface Staff {
   id: string;

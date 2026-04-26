@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useDarkMode } from "@/contexts/DarkModeContext";
 import { useState, useEffect } from "react";
@@ -37,7 +37,6 @@ export default function HRManagePage() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentDateTime, setCurrentDateTime] = useState("");
 
-  // Mock data
   const staffList: Staff[] = [
     {
       id: "EMP001",
@@ -626,7 +625,6 @@ export default function HRManagePage() {
     <div
       className={`${isDarkMode ? "dark" : ""} bg-slate-100 dark:bg-slate-900 transition-colors duration-300 min-h-screen flex flex-col`}
     >
-      {/* Header */}
       <header className="bg-slate-900 px-6 py-3 flex sticky top-0 z-50 shadow-md">
         <div className="flex items-center space-x-4">
           <div className="border-l border-slate-700 pl-4">
@@ -640,7 +638,6 @@ export default function HRManagePage() {
         </div>
       </header>
 
-      {/* Tab Navigation */}
       <div className="tab-container overflow-x-auto no-scrollbar bg-slate-800 border-b border-slate-700 px-6 flex sticky top-12 z-40">
         {[
           { id: "overview", label: "Tổng quan" },
@@ -663,7 +660,6 @@ export default function HRManagePage() {
         ))}
       </div>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-6 bg-slate-800/50">
         <div className="max-w-7xl mx-auto">{renderContent()}</div>
       </main>
